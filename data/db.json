@@ -1,0 +1,74 @@
+{
+  "users": [
+    {
+      "id": "1afdb7b8-a3b3-40e1-8af8-b2ce5207fab8",
+      "email": "admin@tic.jp",
+      "name": "Raja",
+      "pw": "ace7f03f1fa00f106de024a493982550:e2664799636ff54537f0ee0ea35d32c2482962c96551d4db6bf00b8a9a71744252c8a66d358992b63be70b72fc67be5f0a4d4210214d49a9f587e91736b33da5",
+      "role": "admin",
+      "accountId": "mock-88849f6804f8",
+      "mt5": {
+        "login": "8812345",
+        "server": "Exness-MT5Real8",
+        "platform": "mt5"
+      },
+      "settings": {
+        "enabled": true,
+        "multiplier": 1.5,
+        "maxLot": 2,
+        "maxDD": 15,
+        "symbols": [
+          "XAUUSD",
+          "USDJPY"
+        ]
+      }
+    },
+    {
+      "id": "adbd8215-aa0d-450a-b99b-1db9a4b6d816",
+      "email": "budi@mail.com",
+      "name": "Budi",
+      "pw": "c3f56ff18eba7c38e45d4aeea38e8de0:93f258507cc7c48217a1fbe4e36d55ce1b6a994c40442a1013a1149aeb7e1f0e25462d2356eeb02f07d871fc0e075ba342dd3433fefa284a607ccd906368a6d6",
+      "role": "member",
+      "accountId": null,
+      "mt5": null,
+      "settings": {
+        "enabled": false,
+        "multiplier": 1,
+        "maxLot": 1,
+        "maxDD": 20,
+        "symbols": []
+      }
+    },
+    {
+      "id": "6ebc6339-d32c-4717-83c2-32c666948826",
+      "email": "sari@mail.com",
+      "name": "Sari",
+      "pw": "173176de35d360d061368ad4bc93da61:d412135e88f283075cbcd44fba00fba7bb4ead77e0553606ae953168e541258b0f7ced9f479d94d7578fc91546911e6ad50e4648ecf91bc8cb6fc7205e9fc480",
+      "role": "member",
+      "accountId": null,
+      "mt5": null,
+      "settings": {
+        "enabled": false,
+        "multiplier": 1,
+        "maxLot": 1,
+        "maxDD": 20,
+        "symbols": []
+      }
+    }
+  ],
+  "sessions": {
+    "f976f63e07f86a974c6784cc77b323e08ec93f461d39ccfac261f16a8bb6f3f2": "1afdb7b8-a3b3-40e1-8af8-b2ce5207fab8",
+    "fe3e958d8e512a3d0ef87c52c2f820f9c4c356623a1d23d360b3e3225030d812": "1afdb7b8-a3b3-40e1-8af8-b2ce5207fab8"
+  },
+  "strategies": [
+    {
+      "id": "2865",
+      "name": "TIC Gold Leader",
+      "description": "XAUUSD swing & scalping oleh tim TIC JAPAN",
+      "accountId": "mock-80d31d32a518",
+      "leaderLogin": "51234567",
+      "server": "ICMarketsSC-MT5",
+      "created": "2026-10-14T04:57:14.524Z"
+    }
+  ]
+}
