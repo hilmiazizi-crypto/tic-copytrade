@@ -1,0 +1,64 @@
+<!doctype html><html lang="id"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>TIC JAPAN · CopyTrade</title>
+<style>
+:root{--bg:#0a0908;--p:#14110d;--b:#2a2318;--a:#f5a524;--r:#e63946;--g:#2ecc71;--t:#eee6d8;--m:#8d8272}
+*{box-sizing:border-box}body{margin:0;background:radial-gradient(1200px 500px at 80% -10%,#2a1a06 0,transparent 60%),var(--bg);color:var(--t);font:14px/1.5 system-ui,Segoe UI,sans-serif}
+a{color:var(--a)}header{display:flex;align-items:center;gap:18px;padding:14px 28px;border-bottom:1px solid var(--b);background:#0d0b09cc}
+.logo{font-weight:800;letter-spacing:1px}.logo b{color:var(--a)}.logo i{color:var(--r);font-style:normal}
+nav a{color:var(--m);text-decoration:none;margin-right:14px;font-weight:600}nav a.on{color:var(--a)}
+.sp{flex:1}.pill{font-size:11px;padding:3px 9px;border-radius:99px;border:1px solid var(--a);color:var(--a)}
+main{max-width:1200px;margin:0 auto;padding:26px}
+.card{background:linear-gradient(180deg,#17130e,#110e0b);border:1px solid var(--b);border-radius:14px;padding:18px;margin-bottom:18px}
+h2{margin:0 0 12px;font-size:15px;text-transform:uppercase;letter-spacing:1.5px;color:var(--a)}h1{margin:0 0 6px}
+.grid{display:grid;gap:18px}.g4{grid-template-columns:repeat(4,1fr)}.g2{grid-template-columns:1fr 1fr}.g3{grid-template-columns:2fr 1fr}
+.stat .k{color:var(--m);font-size:12px;text-transform:uppercase}.stat .v{font-size:24px;font-weight:800}
+input,select{width:100%;background:#0c0a08;border:1px solid var(--b);color:var(--t);padding:10px;border-radius:8px;margin:4px 0 10px}
+label{font-size:12px;color:var(--m)}button{background:linear-gradient(90deg,var(--a),#ff7a18);color:#120d05;border:0;padding:10px 16px;border-radius:8px;font-weight:800;cursor:pointer}
+button.ghost{background:none;border:1px solid var(--b);color:var(--t)}button.red{background:var(--r);color:#fff}
+table{width:100%;border-collapse:collapse}th,td{text-align:left;padding:8px;border-bottom:1px solid var(--b)}th{color:var(--m);font-size:11px;text-transform:uppercase}
+.up{color:var(--g)}.dn{color:var(--r)}.muted{color:var(--m)}.err{color:var(--r);min-height:18px}
+.auth{max-width:420px;margin:60px auto}.hero{text-align:center;margin-bottom:22px}.hero .k{font-size:54px;color:var(--r);font-weight:900;line-height:1}
+.bars{display:flex;gap:6px;align-items:flex-end;height:70px}.bars div{flex:1;border-radius:4px 4px 0 0}
+.banner{background:#2a1606;border:1px solid #6b4310;color:#ffcf7a;padding:8px 14px;border-radius:8px;margin-bottom:16px;font-size:13px}
+.switch{display:flex;gap:8px;align-items:center}.switch input{width:auto}
+</style></head><body>
+<header><div class="logo"><i>TIC</i> <b>JAPAN</b> · CopyTrade</div><nav id="nav"></nav><div class="sp"></div><span id="mode" class="pill"></span><span id="who" class="muted"></span></header>
+<main id="app"></main>
+<script>
+let T=localStorage.t||'',ME=null,MOCK=true;const $=s=>document.querySelector(s);
+const api=async(u,o={})=>{const r=await fetch(u,{...o,headers:{'Content-Type':'application/json',Authorization:'Bearer '+T},body:o.body&&JSON.stringify(o.body)});const j=await r.json();if(!r.ok)throw Error(j.error);return j};
+const f=(n,d=2)=>n==null?'-':(+n).toLocaleString('en-US',{minimumFractionDigits:d,maximumFractionDigits:d});
+const pl=n=>`<span class="${n>=0?'up':'dn'}">${n>=0?'+':''}${f(n)}</span>`;
+async function route(){const h=location.hash||'#/dashboard';const s=await api('/api/status');MOCK=s.mock;$('#mode').textContent=MOCK?'DEMO / MOCK':'LIVE · MetaApi';
+ if(T){try{ME=await api('/api/me')}catch{T='';localStorage.t=''}}
+ $('#nav').innerHTML=ME?`<a href="#/dashboard" class="${h.includes('dash')?'on':''}">Dashboard</a><a href="#/settings" class="${h.includes('sett')?'on':''}">Copy Settings</a>${ME.role=='admin'?`<a href="#/admin" class="${h.includes('admin')?'on':''}">Admin</a>`:''}<a href="#" onclick="T='';localStorage.t='';ME=null;location.hash='#/login'">Logout</a>`:'';
+ $('#who').textContent=ME?ME.name+(ME.role=='admin'?' (admin)':''):'';
+ if(!ME)return h.includes('register')?register():login();
+ if(h.includes('admin'))return adminPage(); if(h.includes('sett'))return settings(); dashboard()}
+onhashchange=route;
+function login(){$('#app').innerHTML=`<div class="auth"><div class="hero"><div class="k">写</div><h1>Copy the Leader</h1><div class="muted">Hubungkan akun MT5 kamu dan ikuti trader TIC JAPAN secara otomatis.</div></div><div class="card"><h2>Login Member</h2><label>Email</label><input id=e value="${MOCK?'admin@tic.jp':''}"><label>Password</label><input id=p type=password value="${MOCK?'demo12345':''}"><div class=err id=er></div><button onclick="doLogin()">Masuk</button> <a href="#/register" style="margin-left:10px">Daftar akun baru</a></div><p class="muted" style="font-size:11px">Trading forex/CFD berisiko tinggi. Copy trading tidak menjamin profit. Kinerja masa lalu bukan jaminan hasil di masa depan.</p></div>`}
+async function doLogin(){try{const r=await api('/api/login',{method:'POST',body:{email:$('#e').value,password:$('#p').value}});T=r.token;localStorage.t=T;location.hash='#/dashboard';route()}catch(e){$('#er').textContent=e.message}}
+function register(){$('#app').innerHTML=`<div class="auth"><div class="card"><h2>Daftar Member</h2><label>Nama</label><input id=n><label>Email</label><input id=e><label>Password (min 8)</label><input id=p type=password><div class=err id=er></div><button onclick="doReg()">Daftar</button> <a href="#/login" style="margin-left:10px">Sudah punya akun</a></div></div>`}
+async function doReg(){try{await api('/api/register',{method:'POST',body:{name:$('#n').value,email:$('#e').value,password:$('#p').value}});location.hash='#/login'}catch(e){$('#er').textContent=e.message}}
+async function dashboard(){$('#app').innerHTML='<p class=muted>Loading…</p>';const d=await api('/api/dashboard');const i=d.info||{};
+ const conn=d.user.accountId?`<span class=up>● ${d.state}</span> · MT5 ${d.user.mt5.login} @ ${d.user.mt5.server}`:'<span class=dn>● Belum terhubung</span>';
+ $('#app').innerHTML=`${MOCK?'<div class=banner>Mode demo: data di bawah adalah contoh. Set METAAPI_TOKEN untuk data MT5 asli.</div>':''}
+ <div class="grid g4">${[['Balance',f(i.balance)],['Equity',f(i.equity)],['Floating P/L',i.equity!=null?pl(i.equity-i.balance):'-'],['Copy Status',d.user.settings.enabled?'<span class=up>ON</span>':'<span class=dn>OFF</span>']].map(([k,v])=>`<div class="card stat"><div class=k>${k}</div><div class=v>${v}</div></div>`).join('')}</div>
+ <div class="grid g3"><div><div class=card><h2>Open Positions</h2><table><tr><th>Symbol</th><th>Side</th><th>Lot</th><th>Open</th><th>Now</th><th>P/L</th></tr>${d.positions.map(p=>`<tr><td><b>${p.symbol}</b></td><td class="${p.type.includes('BUY')?'up':'dn'}">${p.type.includes('BUY')?'BUY':'SELL'}</td><td>${p.volume}</td><td>${p.openPrice}</td><td>${p.currentPrice}</td><td>${pl(p.profit)}</td></tr>`).join('')||'<tr><td colspan=6 class=muted>Tidak ada posisi</td></tr>'}</table></div>
+ <div class=card><h2>Copied Trade History (30 hari)</h2><table><tr><th>Waktu</th><th>Symbol</th><th>Type</th><th>Lot</th><th>Leader</th><th>Profit</th></tr>${d.history.map(t=>`<tr><td class=muted>${new Date(t.time).toLocaleString('id-ID')}</td><td>${t.symbol}</td><td>${(t.type||'').replace('DEAL_TYPE_','')}</td><td>${t.volume}</td><td>${t.strategy||''}</td><td>${pl(t.profit)}</td></tr>`).join('')||'<tr><td colspan=6 class=muted>Belum ada</td></tr>'}</table></div></div>
+ <div><div class=card><h2>Akun MT5</h2><p>${conn}</p>${d.user.accountId?'':`<label>Login MT5</label><input id=ml><label>Password (trading)</label><input id=mp type=password><label>Server broker</label><input id=ms placeholder="Exness-MT5Real8"><div class=err id=er></div><button onclick="conn5()">Hubungkan MT5</button><p class=muted style="font-size:11px">Password dikirim ke MetaApi untuk provisioning dan tidak disimpan di server kami.</p>`}</div>
+ ${d.leaders.map(l=>`<div class=card><h2>Leader · ${l.name}</h2><div class=muted>${l.description||''}</div>${l.perf.monthly?`<div class="grid g2" style="margin:10px 0"><div class=stat><div class=k>Total gain</div><div class="v up">+${l.perf.gain}%</div></div><div class=stat><div class=k>Max DD</div><div class="v dn">${l.perf.maxDD}%</div></div></div><div class=bars>${l.perf.monthly.map(m=>`<div style="height:${Math.abs(m)*8}px;background:${m>=0?'var(--a)':'var(--r)'}"></div>`).join('')}</div><p class=muted>Win rate ${l.perf.winRate}% · ${l.perf.trades} trades${l.perfIsSample?' · (sample)':''}</p>`:`<p>Trades 30d: ${l.perf.trades} · Win ${l.perf.winRate}% · P/L ${pl(l.perf.profit30d)}</p>`}</div>`).join('')||'<div class=card class=muted>Belum ada leader. Admin perlu menambahkan strategy.</div>'}</div></div>`}
+async function conn5(){try{await api('/api/mt5/connect',{method:'POST',body:{login:$('#ml').value,password:$('#mp').value,server:$('#ms').value}});dashboard()}catch(e){$('#er').textContent=e.message}}
+function settings(){const s=ME.settings;$('#app').innerHTML=`<div class=card style="max-width:560px"><h2>Copy Settings</h2><div class=switch><input type=checkbox id=en ${s.enabled?'checked':''}><label for=en>Aktifkan copy trading</label></div><br>
+ <label>Lot multiplier (x)</label><input id=mu type=number step=0.1 value=${s.multiplier}><label>Max lot per trade</label><input id=ml type=number step=0.01 value=${s.maxLot}>
+ <label>Max drawdown stop (%) — semua posisi ditutup & copy berhenti</label><input id=dd type=number value=${s.maxDD}><label>Symbol filter (kosong = semua), pisahkan koma</label><input id=sy value="${s.symbols.join(', ')}" placeholder="XAUUSD, USDJPY">
+ <div class=err id=er></div><button onclick="saveS()">Simpan</button> <span id=ok class=up></span></div>`}
+async function saveS(){try{ME=await api('/api/settings',{method:'PUT',body:{enabled:$('#en').checked,multiplier:$('#mu').value,maxLot:$('#ml').value,maxDD:$('#dd').value,symbols:$('#sy').value}});$('#ok').textContent='Tersimpan ✓'}catch(e){$('#er').textContent=e.message}}
+async function adminPage(){const d=await api('/api/admin/overview');$('#app').innerHTML=`<div class="grid g2"><div class=card><h2>Tambah Leader / Strategy</h2>
+ <label>Nama strategy</label><input id=sn placeholder="TIC Gold Leader"><label>Deskripsi</label><input id=sd><label>MT5 login leader</label><input id=sl><label>Password leader</label><input id=sp type=password><label>Server</label><input id=ss><label>…atau MetaApi accountId yang sudah ada</label><input id=sa><div class=err id=er></div><button onclick="addS()">Buat Strategy</button></div>
+ <div class=card><h2>Strategies aktif</h2><table><tr><th>ID</th><th>Nama</th><th>Leader</th><th></th></tr>${d.strategies.map(s=>`<tr><td><b>${s.id}</b></td><td>${s.name}</td><td class=muted>${s.leaderLogin||s.accountId}</td><td><button class=red onclick="delS('${s.id}')">Hapus</button></td></tr>`).join('')||'<tr><td colspan=4 class=muted>Belum ada</td></tr>'}</table></div></div>
+ <div class=card><h2>Members (${d.members.length})</h2><table><tr><th>Nama</th><th>Email</th><th>Role</th><th>MT5</th><th>Copy</th><th>Multiplier</th><th>Max lot</th><th>Max DD</th><th>Symbols</th></tr>${d.members.map(m=>`<tr><td>${m.name}</td><td class=muted>${m.email}</td><td>${m.role}</td><td>${m.mt5?m.mt5.login+' @ '+m.mt5.server:'<span class=dn>-</span>'}</td><td>${m.settings.enabled?'<span class=up>ON</span>':'<span class=dn>OFF</span>'}</td><td>${m.settings.multiplier}x</td><td>${m.settings.maxLot}</td><td>${m.settings.maxDD}%</td><td>${m.settings.symbols.join(', ')||'All'}</td></tr>`).join('')}</table></div>`}
+async function addS(){try{await api('/api/admin/strategy',{method:'POST',body:{name:$('#sn').value,description:$('#sd').value,login:$('#sl').value,password:$('#sp').value,server:$('#ss').value,accountId:$('#sa').value||undefined}});adminPage()}catch(e){$('#er').textContent=e.message}}
+async function delS(id){if(confirm('Hapus strategy '+id+'?')){await api('/api/admin/strategy/'+id,{method:'DELETE'});adminPage()}}
+route();
+</script></body></html>
